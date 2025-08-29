@@ -1,0 +1,6 @@
+---
+- name: Check Ansible
+  hosts: localhost
+  tasks:
+    - debug:
+        msg: "Ansible is working"

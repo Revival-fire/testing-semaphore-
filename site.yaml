@@ -1,0 +1,46 @@
+---
+- name: Setup Nginx and Certbot
+  hosts: testing
+  become: yes
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - nginx
+          - python3-certbot-nginx
+        state: present
+        update_cache: yes
+
+    - name: Ensure Nginx is running
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Configure default Nginx site
+      copy:
+        dest: /etc/nginx/sites-available/default
+        content: |
+          server {
+              listen 80;
+              server_name yourdomain.com;
+
+              location / {
+                  root /var/www/html;
+                  index index.html;
+              }
+          }
+      notify: Restart nginx
+
+    - name: Create test index.html
+      copy:
+        dest: /var/www/html/index.html
+        content: "<h1>Hello from Ansible + Nginx</h1>"
+
+
+  handlers:
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
